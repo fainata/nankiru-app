@@ -628,26 +628,29 @@ function playSound(soundId){
   }
 
   if(soundId === "soundWrong"){
-  sound.volume = 1.0;
-}else{
-  sound.volume = 0.7;
-}
+    sound.volume = 1.0;
+  }else{
+    sound.volume = 0.75;
+  }
 
-  sound.currentTime = 0;
+  try{
+    sound.pause();
+    sound.currentTime = 0;
+  }catch(error){
+    // 何もしない
+  }
 
   var playPromise = sound.play();
 
   if(playPromise !== undefined){
     playPromise.catch(function(error){
-      // ブラウザ側で音が止められた場合は何もしない
+      // iPhone Safari側で止められた場合は何もしない
     });
   }
 }
 
 function selectMode(seconds){
   selectedMode = seconds;
-  
-  unlockSounds();
 
   document.getElementById("mode3").className = "modeButton";
   document.getElementById("mode5").className = "modeButton";
