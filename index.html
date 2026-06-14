@@ -484,6 +484,20 @@ var tileImages = {
   "7z": "images/p_ji_c_1.gif"   // 中
 };
 
+var preloadedTileImages = [];
+
+function preloadTileImages(){
+  for(var tile in tileImages){
+    if(tileImages.hasOwnProperty(tile)){
+      var img = new Image();
+      img.src = tileImages[tile];
+      preloadedTileImages.push(img);
+    }
+  }
+}
+
+preloadTileImages();
+
 var currentQuestion = -1;
 var timeLeft = 0;
 var answered = false;
