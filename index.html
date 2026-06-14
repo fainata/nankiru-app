@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>イーシャンテン何切る</title>
+
+<style>
+html{
+  background:#f4f1e8;
+}
+
+body{
+  max-width:760px;
+  margin:0 auto;
+  padding:12px;
+  font-family:"Meiryo","Yu Gothic",sans-serif;
+  background:#f4f1e8;
+  min-height:100vh;
+  box-sizing:border-box;
+  color:#222;
+}
+
+h2{
+  margin:0 0 12px 0;
+  padding:14px;
+  background:#1f6b4f;
+  color:white;
+  border-radius:12px;
+  text-align:center;
+  font-size:22px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.25);
+}
+
+p{
+  margin:10px 0;
+}
+
+button{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  margin:4px 2px;
+  background:#2f7d5c;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 3px 0 #1d4f3a;
+}
+
+button:active{
+  transform:translateY(2px);
+  box-shadow:0 1px 0 #1d4f3a;
+}
+
+#timer{
+  font-weight:bold;
+  color:#b03030;
+}
+
+#questionTitle{
+  margin-top:14px;
+  padding:10px 12px;
+  background:white;
+  border-left:6px solid #2f7d5c;
+  border-radius:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+}
+
+#roundInfo{
+  background:white;
+  padding:10px;
+  border-radius:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+  white-space:nowrap;
+  overflow-x:auto;
+}
+
+#hand{
+  background:white;
+  padding:12px 8px;
+  border-radius:12px;
+  box-shadow:0 1px 5px rgba(0,0,0,0.22);
+  white-space:nowrap;
+  overflow-x:auto;
+}
+
+#result{
+  background:white;
+  min-height:40px;
+  padding:12px;
+  border-radius:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+  line-height:1.8;
+}
+
+audio{
+  display:none;
+}
+
+#nextButton{
+  min-width:120px;
+  padding:12px 18px;
+  font-size:16px;
+  font-weight:bold;
+  background:#4F7A63;
+}
+
+#backTitleButton{
+  background:#777;
+}
+
+.homeScreen{
+  padding:18px 0;
+}
+
+.homeCard{
+  max-width:520px;
+  margin:18px auto;
+  padding:24px 18px 26px 18px;
+  background:#ffffff;
+  border-radius:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.22);
+  text-align:center;
+  border:1px solid #e3dccd;
+}
+
+.homeTitle{
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#234236;
+}
+
+.homeSubTitle{
+  font-size:14px;
+  color:#666;
+  margin-bottom:20px;
+}
+
+.modeArea{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+.modeButton{
+  width:130px;
+  min-height:72px;
+  background:#f7f3e8;
+  color:#333;
+  border:2px solid #d8c9ad;
+  border-radius:14px;
+  box-shadow:0 3px 0 #c2b291;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.modeButton span{
+  display:block;
+  margin-top:5px;
+  font-size:12px;
+  font-weight:normal;
+  color:#666;
+}
+
+.modeButton.selected{
+  background:#4F7A63;
+  color:white;
+  border-color:#355342;
+  box-shadow:0 3px 0 #2f4d3d;
+}
+
+.modeButton.selected span{
+  color:#e9f3ee;
+}
+
+.selectedModeText{
+  min-height:22px;
+  color:#4F7A63;
+  font-weight:bold;
+}
+
+#startButton{
+  width:72%;
+  max-width:280px;
+  padding:14px 18px;
+  margin-top:8px;
+  border-radius:999px;
+  background:#4F7A63;
+  box-shadow:0 4px 0 #355342;
+  font-size:20px;
+  font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>イーシャンテン何切る</h2>
+
+<div id="startScreen" class="homeScreen">
+  <div class="homeCard">
+
+    <div class="homeTitle">イーシャンテン何切る</div>
+    <div class="homeSubTitle">制限時間を選んでスタート</div>
+
+    <div class="modeArea">
+      <button id="mode3" class="modeButton" onclick="selectMode(3)">
+        3秒
+        <span>瞬発力</span>
+      </button>
+
+      <button id="mode5" class="modeButton" onclick="selectMode(5)">
+        5秒
+        <span>標準</span>
+      </button>
+
+      <button id="mode0" class="modeButton" onclick="selectMode(0)">
+        無制限
+        <span>じっくり</span>
+      </button>
+    </div>
+
+    <p id="selectedModeText" class="selectedModeText">モード未選択</p>
+
+    <button id="startButton" onclick="startApp()">スタート</button>
+
+  </div>
+</div>
+
+<div id="gameScreen" style="display:none;">
+  <p>残り時間：<span id="timer">-</span></p>
+
+  <h3 id="questionTitle">問題1</h3>
+
+  <div id="roundInfo" style="margin:10px 0 14px 0;"></div>
+  <div id="hand"></div>
+
+  <p id="result"></p>
+
+  <div id="gameButtons" style="display:flex; align-items:center; margin-top:10px;">
+  <button id="backTitleButton" onclick="backToTitle()">タイトルに戻る</button>
+  <button id="nextButton" onclick="nextQuestion()" style="display:none; margin-left:auto;">次の問題へ</button>
+  </div>
+  
+</div>
+
+<audio id="soundQuestion" src="sounds/question.mp3" preload="auto"></audio>
+<audio id="soundTsumo" src="sounds/tsumo.mp3" preload="auto"></audio>
+<audio id="soundCorrect" src="sounds/correct.mp3" preload="auto"></audio>
+<audio id="soundWrong" src="sounds/wrong.mp3" preload="auto"></audio>
+<audio id="soundTimeout" src="sounds/timeout.mp3" preload="auto"></audio>
+
+<script>
+var questions = [
+  {
+    title: "問題1",
+	
+    hand: ["2m","3m","4m","4m","5m","6m","7m","7m","8m","2p","2p","3p","9s","9s"],
+    correct: ["7m"],
+    ok: [],
+	ukeire: [
+     { tile: "7m", count: 22 },
+     { tile: "2p", count: 22 },
+     { tile: "3p", count: 16 }
+  ],
+    comment:
+      "三面張固定の打{7m}が最も和了率が高い。<br>"
+  },
+  {
+    title: "問題2",
+    hand: ["2m","3m","4m","5m","4p","5p","6p","8p","1s","2s","3s","6s","6s","8s"],
+    correct: ["8s"],
+    ok: [],
+	ukeire: [
+     { tile: "8s", count: 44 },
+     { tile: "6p", count: 37 },
+     { tile: "2m", count: 31 }
+  ],
+    comment:
+      "{8p}と{8s}の2択だが、受け入れは打{8s}のほうが7枚も多く、<br>" +
+      "{7p}引きが強すぎるので{8s}切りが有利。。"
+  },
+  {
+    title: "問題3",
+    hand: ["1m","1m","2m","5m","6m","7m","7p","8p","8p","2s","2s","3s","4s","5s"],
+    correct: ["8p"],
+    ok: [],
+	ukeire: [
+     { tile: "8p", count: 16 },
+     { tile: "1m", count: 16 },
+     { tile: "2m", count: 14 }
+  ],
+    comment:
+      "{8p}が枚数、良形率ともに最大。"
+  },
+  {
+    title: "問題4",
+    hand: ["1m","1m","2m","2m","3m","4m","5m","5m","6p","7p","7p","7s","8s","9s"],
+    correct: ["7p"],
+    ok: [],
+	ukeire: [
+     { tile: "5m", count: 21 },
+     { tile: "7p", count: 17 },
+     { tile: "4m", count: 15 },
+	 { tile: "1m", count: 15 }
+  ],
+    comment:
+    "{2m2m3m4m5m5m}に{1m}が2枚くっついた形。<br>" +
+    "打{7p}とすると{1m2m5m}引きでリャンメンリーチが打てる<br>" +
+	"{3m}引きでピンフ一盃口がつく。"
+  },
+  {
+    title: "問題5",
+    hand: ["1m","2m","2m","3m","4m","5m","5m","6m","6p","7p","7p","7s","8s","9s"],
+    correct: ["7p"],
+    ok: [],
+	ukeire: [
+     { tile: "2m", count: 32 },
+     { tile: "5m", count: 32 },
+     { tile: "7p", count: 22 },
+	 { tile: "6p", count: 22 },
+	 { tile: "1m", count: 19 }
+  ],
+    comment:
+      "両翼形を端に置いた形。<br>" +
+      "{7p}が和了率最大で、聴牌時必ずピンフとなる。"
+  },
+  {
+    title: "問題6",
+    hand: ["2m","2m","3m","4m","5m","5m","6m","6m","2p","2p","3p","7s","8s","9s"],
+    correct: ["2p","3m"],
+    ok: [],
+	ukeire: [
+	 { tile: "2m", count: 25 },
+     { tile: "2p", count: 21 },
+     { tile: "3m", count: 19 },
+     { tile: "3p", count: 19 }
+  ],
+    comment:
+    "{2m2m3m4m5m5m}に{6m}が2枚くっついた形。<br>" +
+    "枚数は2番手だが、良形確定でピンフと一盃口が残る打{2p}が和了率最大でバランスが良い。<br>" +
+	"和了率は下がるが打点を追う打{3m}も有力で、状況次第で使い分けたい。"
+  },
+  {
+    title: "問題7",
+    hand: ["3m","3m","4m","5m","6m","6m","7m","7m","3p","4p","4p","6s","7s","8s"],
+    correct: ["4p"],
+    ok: ["4m"],
+	ukeire: [
+	 { tile: "3m", count: 25 },
+     { tile: "4p", count: 21 },
+     { tile: "4m", count: 19 },
+     { tile: "3p", count: 19 }
+  ],
+    comment:
+      "{3m}{3m}{4m}{5m}{6m}{6m}に{7m}が2枚くっ付いた形。<br>" +
+      "{4p}が和了率と打点のバランスが良く期待値最大。<br>" +
+	  "{4m}も、和了率は下がるが打点が強く見る一打で有力。"
+  },
+  {
+    title: "問題8",
+    hand: ["4m","5m","5m","6m","7m","7m","8m","8m","5p","5p","6p","1s","2s","3s"],
+    correct: ["5p"],
+    ok: ["4m"],
+	ukeire: [
+	 { tile: "5m", count: 25 },
+     { tile: "5p", count: 23 },
+     { tile: "4m", count: 21 },
+	 { tile: "7m", count: 19 },
+     { tile: "6p", count: 19 }
+  ],
+    comment:
+      "{5m}{5m}{6m}{7m}{8m}{8m}に{4m}と{7m}がくっ付いた形。<br>" +
+      "{5p}が和了率と打点のバランスが良く期待値最大。<br>" +
+	  "{4m}も、和了率は下がるが打点が強く見る一打で有力。"
+  },
+  {   
+　　  title: "問題9",
+    hand: ["2p","2p","3p","5p","6p","7p","9p","9p","2s","3s","4s","5s","5s","6s"],
+    correct: ["5s"],
+    ok: [],
+	ukeire: [
+	 { tile: "5s", count: 23 },
+     { tile: "2p", count: 23 },
+     { tile: "2s", count: 19 }
+  ],
+    comment:
+      "{5s}切りで三面張を固定する。" 
+  },
+  {
+  title: "問題10",
+  hand: ["4m","5m","5m","6m","7m","7m","8m","9m","9m","2p","3p","3p","8s","8s"],
+  correct: ["3p"],
+  ok: ["9m"],
+  ukeire: [
+    { tile: "9m", count: 19 },
+    { tile: "3p", count: 18 },
+    { tile: "2p", count: 17 },
+    { tile: "5m", count: 15 }
+  ],
+  comment:
+    "打{9m}が枚数最多だが、1枚程度の差ならピンフと一盃口を見て打{3p}とする。"
+},
+{
+  title: "問題11",
+  hand: ["1m","1m","2m","3m","3m","4m","5m","5m","6m","9p","9p","3s","4s","4s"],
+  correct: ["4s"],
+  ok: ["1m"],
+  ukeire: [
+    { tile: "1m", count: 19 },
+    { tile: "4s", count: 18 },
+    { tile: "3s", count: 17 },
+    { tile: "5m", count: 15 }
+  ],
+  comment:
+    "打{1m}が枚数最多だが、1枚程度の差ならピンフと一盃口を見て打{4s}とする。"
+},
+{
+  title: "問題12",
+  round: "東一局",
+  honba: 0,
+  seatWind: "南家",
+  junme: 5,
+  doraIndicator: "3s",
+
+  hand: ["2m","4m","5m","6m","6m","6m","7m","7m","8m","1p","1p","4s","4s","5s"],
+  correct: ["2m"],
+  ok: [],
+  ukeire: [
+    { tile: "2m", count: 17 },
+    { tile: "4s", count: 17 },
+    { tile: "6m", count: 15 },
+    { tile: "5s", count: 14 }
+  ],
+  comment:
+    "{2m4m5m6m6m7m}に{6m7m8m}が融合している。<br>"+
+	"基本はピンフ狙いの{4s}だがドラが{4s}なので打{2m}で使い切りたい。"
+}
+];
+
+var tileImages = {
+  "1m": "images/p_ms1_1.gif",
+  "2m": "images/p_ms2_1.gif",
+  "3m": "images/p_ms3_1.gif",
+  "4m": "images/p_ms4_1.gif",
+  "5m": "images/p_ms5_1.gif",
+  "6m": "images/p_ms6_1.gif",
+  "7m": "images/p_ms7_1.gif",
+  "8m": "images/p_ms8_1.gif",
+  "9m": "images/p_ms9_1.gif",
+
+  "1p": "images/p_ps1_1.gif",
+  "2p": "images/p_ps2_1.gif",
+  "3p": "images/p_ps3_1.gif",
+  "4p": "images/p_ps4_1.gif",
+  "5p": "images/p_ps5_1.gif",
+  "6p": "images/p_ps6_1.gif",
+  "7p": "images/p_ps7_1.gif",
+  "8p": "images/p_ps8_1.gif",
+  "9p": "images/p_ps9_1.gif",
+
+  "1s": "images/p_ss1_1.gif",
+  "2s": "images/p_ss2_1.gif",
+  "3s": "images/p_ss3_1.gif",
+  "4s": "images/p_ss4_1.gif",
+  "5s": "images/p_ss5_1.gif",
+  "6s": "images/p_ss6_1.gif",
+  "7s": "images/p_ss7_1.gif",
+  "8s": "images/p_ss8_1.gif",
+  "9s": "images/p_ss9_1.gif",
+  
+  "1z": "images/p_ji_e_1.gif",  // 東
+  "2z": "images/p_ji_s_1.gif",  // 南
+  "3z": "images/p_ji_w_1.gif",  // 西
+  "4z": "images/p_ji_n_1.gif",  // 北
+  "5z": "images/p_no_1.gif",    // 白
+  "6z": "images/p_ji_h_1.gif",  // 発
+  "7z": "images/p_ji_c_1.gif"   // 中
+};
+
+var currentQuestion = -1;
+var timeLeft = 0;
+var answered = false;
+var timerId = null;
+var revealTimerId = null;
+var selectedMode = null;
+var canAnswer = false;
+var currentDisplayTsumo = "";
+
+var currentCorrect = [];
+var currentOk = [];
+var currentComment = "";
+var currentUkeireHtml = "";
+
+function getTileHtml(tile, size){
+  return '<img src="' + tileImages[tile] + '" ' +
+         'style="width:' + size + 'px; vertical-align:middle; margin:0 2px;">';
+}
+
+function getBackTileHtml(size, color){
+  var height = Math.floor(size * 1.35);
+
+  if(!color){
+    color = "#D99A52";
+  }
+
+  return '<span style="' +
+         'display:inline-block;' +
+         'width:' + size + 'px;' +
+         'height:' + height + 'px;' +
+         'background:' + color + ';' +
+         'border:1px solid #B36F35;' +
+         'border-radius:3px;' +
+         'vertical-align:middle;' +
+         'margin:0 0.5px;' +
+         '"></span>';
+}
+
+function renderRoundInfo(q, suitMap){
+  var round = q.round || "東一局";
+  var honba = (q.honba !== undefined) ? q.honba : 0;
+  var seatWind = q.seatWind || "南家";
+  var junme = (q.junme !== undefined) ? q.junme : 5;
+  var doraIndicator = q.doraIndicator || "1z";
+
+  var html = "";
+
+  html += '<span style="font-size:18px; vertical-align:middle;">';
+  html += round + "　" + honba + "本場　" + seatWind + "　" + junme + "巡目";
+  html += '</span>';
+
+  html += '<span style="display:inline-block; margin-left:24px; vertical-align:middle;">';
+
+  var leftBackColor = "#E3B06E";
+  var rightBackColor = "#E3B06E";
+
+  html += getBackTileHtml(28, leftBackColor);
+  html += getBackTileHtml(28, leftBackColor);
+
+  var displayDora = convertTileSuit(doraIndicator, suitMap);
+  html += getTileHtml(displayDora, 28);
+
+  html += getBackTileHtml(28, rightBackColor);
+  html += getBackTileHtml(28, rightBackColor);
+  html += getBackTileHtml(28, rightBackColor);
+  html += getBackTileHtml(28, rightBackColor);
+
+  html += '</span>';
+
+  document.getElementById("roundInfo").innerHTML = html;
+}
+
+function playSound(soundId){
+  var sound = document.getElementById(soundId);
+
+  if(!sound){
+    return;
+  }
+
+  sound.volume = 0.7; // 音量 0.0〜1.0
+  sound.currentTime = 0;
+
+  var playPromise = sound.play();
+
+  if(playPromise !== undefined){
+    playPromise.catch(function(error){
+      // ブラウザ側で音が止められた場合は何もしない
+    });
+  }
+}
+
+function selectMode(seconds){
+  selectedMode = seconds;
+
+  document.getElementById("mode3").className = "modeButton";
+  document.getElementById("mode5").className = "modeButton";
+  document.getElementById("mode0").className = "modeButton";
+
+  if(seconds === 3){
+    document.getElementById("selectedModeText").innerHTML = "3秒モードを選択中";
+    document.getElementById("mode3").className = "modeButton selected";
+  }else if(seconds === 5){
+    document.getElementById("selectedModeText").innerHTML = "5秒モードを選択中";
+    document.getElementById("mode5").className = "modeButton selected";
+  }else{
+    document.getElementById("selectedModeText").innerHTML = "無制限モードを選択中";
+    document.getElementById("mode0").className = "modeButton selected";
+  }
+}
+
+function startApp(){
+  if(selectedMode === null){
+    document.getElementById("selectedModeText").innerHTML = "先にモードを選んでください。";
+    return;
+  }
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+
+  chooseRandomQuestion();
+}
+
+//chooseRandomQuestion();
+
+function chooseRandomQuestion(){
+
+  var nextQuestion;
+
+  if(questions.length === 1){
+    nextQuestion = 0;
+  }else{
+    do{
+      nextQuestion = Math.floor(Math.random() * questions.length);
+    }while(nextQuestion === currentQuestion);
+  }
+
+  currentQuestion = nextQuestion;
+  showQuestion();
+
+  if(selectedMode !== null){
+    startGame(selectedMode);
+  }
+}
+
+function convertComment(comment, suitMap){
+  return comment.replace(/\{((?:[1-9][mps]|[1-7]z)+)\}/g, function(match, tilesText){
+    var tiles = tilesText.match(/([1-9][mps]|[1-7]z)/g);
+    var html = "";
+
+    if(!tiles){
+      return match;
+    }
+
+    for(var i = 0; i < tiles.length; i++){
+      var convertedTile = convertTileSuit(tiles[i], suitMap);
+      html += getTileHtml(convertedTile, 22);
+    }
+
+    return html;
+  });
+}
+
+function makeSuitMap(){
+  var patterns = [
+    { m: "m", p: "p", s: "s" },
+    { m: "m", p: "s", s: "p" },
+    { m: "p", p: "m", s: "s" },
+    { m: "p", p: "s", s: "m" },
+    { m: "s", p: "m", s: "p" },
+    { m: "s", p: "p", s: "m" }
+  ];
+
+  return patterns[Math.floor(Math.random() * patterns.length)];
+}
+
+function convertTileSuit(tile, suitMap){
+  var number = tile.substring(0, 1);
+  var suit = tile.substring(1, 2);
+
+  if(suit === "m" || suit === "p" || suit === "s"){
+    return number + suitMap[suit];
+  }
+
+  return tile;
+}
+
+function convertTileList(tileList, suitMap){
+  var newList = [];
+
+  for(var i = 0; i < tileList.length; i++){
+    newList.push(convertTileSuit(tileList[i], suitMap));
+  }
+
+  return newList;
+}
+
+function convertUkeire(ukeire, suitMap){
+  if(!ukeire){
+    return "";
+  }
+
+  var html = '<span style="margin-left:20px;">：';
+
+  for(var i = 0; i < ukeire.length; i++){
+    var convertedTile = convertTileSuit(ukeire[i].tile, suitMap);
+
+    html += getTileHtml(convertedTile, 22);
+    html += ukeire[i].count + "枚 ";
+
+    if(i < ukeire.length - 1){
+      html += " / ";
+    }
+  }
+
+  html += "</span>";
+
+  return html;
+}
+
+function shuffleSuitBlocks(hand){
+  var blocks = {
+    m: [],
+    p: [],
+    s: [],
+    z: []
+  };
+
+  for(var i = 0; i < hand.length; i++){
+    var tile = hand[i];
+    var suit = tile.substring(1, 2);
+
+    if(suit === "m" || suit === "p" || suit === "s"){
+      blocks[suit].push(tile);
+    }else{
+      blocks.z.push(tile);
+    }
+  }
+
+  var orders = [
+    ["m", "p", "s"],
+    ["m", "s", "p"],
+    ["p", "m", "s"],
+    ["p", "s", "m"],
+    ["s", "m", "p"],
+    ["s", "p", "m"]
+  ];
+
+  var order = orders[Math.floor(Math.random() * orders.length)];
+
+  var newHand = [];
+
+  for(var j = 0; j < order.length; j++){
+    var suitName = order[j];
+
+    for(var k = 0; k < blocks[suitName].length; k++){
+      newHand.push(blocks[suitName][k]);
+    }
+  }
+
+  for(var z = 0; z < blocks.z.length; z++){
+    newHand.push(blocks.z[z]);
+  }
+
+  return newHand;
+}
+
+function showQuestion(){
+  var q = questions[currentQuestion];
+
+  var suitMap = makeSuitMap();
+  renderRoundInfo(q, suitMap);
+
+  var tsumoIndex = Math.floor(Math.random() * q.hand.length);
+  var originalTsumo = q.hand[tsumoIndex];
+
+  var originalHand = [];
+
+  for(var t = 0; t < q.hand.length; t++){
+    if(t !== tsumoIndex){
+      originalHand.push(q.hand[t]);
+    }
+  }
+
+  var displayHand = convertTileList(originalHand, suitMap);
+  displayHand = shuffleSuitBlocks(displayHand);
+
+  currentDisplayTsumo = convertTileSuit(originalTsumo, suitMap);
+
+  currentCorrect = convertTileList(q.correct, suitMap);
+  currentOk = convertTileList(q.ok, suitMap);
+  currentComment = convertComment(q.comment, suitMap);
+  currentUkeireHtml = convertUkeire(q.ukeire, suitMap);
+
+  document.getElementById("questionTitle").innerHTML = q.title;
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("timer").innerHTML = "-";
+  document.getElementById("nextButton").style.display = "none";
+
+  answered = false;
+  canAnswer = false;
+
+  var handArea = document.getElementById("hand");
+  handArea.innerHTML = "";
+
+  for(var i = 0; i < displayHand.length; i++){
+    var tile = displayHand[i];
+
+    var img = document.createElement("img");
+    img.src = tileImages[tile];
+    img.style.margin = "3px";
+    img.style.width = "38px";
+    img.style.verticalAlign = "top";
+    img.style.opacity = "0.9";
+
+    img.onclick = (function(selectedTile){
+      return function(){
+        answer(selectedTile);
+      };
+    })(tile);
+
+    handArea.appendChild(img);
+  }
+
+ // var waitingText = document.createElement("span");
+ // waitingText.id = "waitingText";
+ // waitingText.innerHTML = "<br>ツモ待ち...";
+ // handArea.appendChild(waitingText);
+  playSound("soundQuestion");
+}
+
+function revealTsumoAndStartTimer(){
+  playSound("soundTsumo");
+  
+  var handArea = document.getElementById("hand");
+
+  var waitingText = document.getElementById("waitingText");
+  if(waitingText){
+    waitingText.innerHTML = "";
+  }
+
+  var space = document.createElement("span");
+  space.innerHTML = "&nbsp;&nbsp;&nbsp;";
+  handArea.appendChild(space);
+
+  var tsumoImg = document.createElement("img");
+  tsumoImg.src = tileImages[currentDisplayTsumo];
+  tsumoImg.style.margin = "3px";
+  tsumoImg.style.width = "38px";
+  tsumoImg.style.verticalAlign = "top";
+  //tsumoImg.style.border = "2px solid red";
+
+  tsumoImg.onclick = function(){
+    answer(currentDisplayTsumo);
+  };
+
+  handArea.appendChild(tsumoImg);
+
+  var imgs = handArea.getElementsByTagName("img");
+
+  for(var i = 0; i < imgs.length; i++){
+    imgs[i].style.opacity = "1";
+    imgs[i].style.cursor = "pointer";
+  }
+
+  canAnswer = true;
+
+  if(selectedMode === 0){
+    document.getElementById("timer").innerHTML = "無制限";
+    return;
+  }
+
+  timeLeft = selectedMode;
+  document.getElementById("timer").innerHTML = timeLeft + "秒";
+
+  timerId = setInterval(function(){
+    timeLeft = timeLeft - 1;
+    document.getElementById("timer").innerHTML = timeLeft + "秒";
+
+  if(timeLeft <= 0 && answered === false){
+   answered = true;
+   canAnswer = false;
+   clearInterval(timerId);
+
+   playSound("soundTimeout");
+
+   document.getElementById("result").innerHTML =
+    "時間切れ！" + currentUkeireHtml + "<br><br>" +
+    "正解：<br>" +
+    currentComment;
+	
+	document.getElementById("nextButton").style.display = "inline-block";
+}
+  }, 1000);
+}
+
+function startGame(seconds){
+  selectedMode = seconds;
+
+  if(timerId !== null){
+    clearInterval(timerId);
+  }
+
+  if(revealTimerId !== null){
+    clearTimeout(revealTimerId);
+  }
+
+  answered = false;
+  canAnswer = false;
+
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("timer").innerHTML = "-";
+
+  revealTimerId = setTimeout(function(){
+  revealTsumoAndStartTimer();
+}, 1000);
+}
+
+function answer(tile){
+  if(selectedMode === null){
+    document.getElementById("result").innerHTML =
+      "先にモードを選んでください。";
+    return;
+  }
+
+  if(canAnswer === false){
+    return;
+  }
+
+  if(answered === true){
+    return;
+  }
+
+  answered = true;
+
+  if(timerId !== null){
+    clearInterval(timerId);
+  }
+
+  var q = questions[currentQuestion];
+
+if(currentCorrect.indexOf(tile) !== -1){
+
+  playSound("soundCorrect");
+
+  document.getElementById("result").innerHTML =
+   "◎ 正解！" + currentUkeireHtml + "<br><br>" + currentComment;
+
+}else if(currentOk && currentOk.indexOf(tile) !== -1){
+
+  playSound("soundCorrect");
+
+  document.getElementById("result").innerHTML =
+   "○ 及第点！" + currentUkeireHtml + "<br><br>" + currentComment;
+
+}else{
+
+  playSound("soundWrong");
+
+  document.getElementById("result").innerHTML =
+    "× 不正解" + currentUkeireHtml + "<br><br>" + currentComment;
+
+}
+
+document.getElementById("nextButton").style.display = "inline-block";
+
+}
+
+function nextQuestion(){
+  if(timerId !== null){
+    clearInterval(timerId);
+  }
+
+  if(revealTimerId !== null){
+    clearTimeout(revealTimerId);
+  }
+
+  canAnswer = false;
+
+  chooseRandomQuestion();
+}
+
+function backToTitle(){
+  if(timerId !== null){
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  if(revealTimerId !== null){
+    clearTimeout(revealTimerId);
+    revealTimerId = null;
+  }
+
+  answered = false;
+  canAnswer = false;
+
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("startScreen").style.display = "block";
+
+  document.getElementById("timer").innerHTML = "-";
+  document.getElementById("questionTitle").innerHTML = "";
+  document.getElementById("roundInfo").innerHTML = "";
+  document.getElementById("hand").innerHTML = "";
+  document.getElementById("result").innerHTML = "";
+
+  document.getElementById("nextButton").style.display = "none";
+
+  selectedMode = null;
+  document.getElementById("selectedModeText").innerHTML = "モード未選択";
+}
+</script>
+
+</body>
+</html>
