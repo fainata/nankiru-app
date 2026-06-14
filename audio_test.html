@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音テスト</title>
+
+<style>
+body{
+  font-family:"Meiryo", sans-serif;
+  padding:20px;
+  background:#f4f1e8;
+  color:#222;
+}
+
+button{
+  display:block;
+  width:220px;
+  padding:14px;
+  margin:12px 0;
+  font-size:18px;
+  border:0;
+  border-radius:10px;
+  background:#4F7A63;
+  color:white;
+}
+
+#status{
+  margin:16px 0;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>音テスト</h2>
+
+<p>まず「音声を準備」を押してください。</p>
+
+<button onclick="initAudio()">音声を準備</button>
+
+<p id="status">未準備</p>
+
+<button onclick="playSE('question')">出題音</button>
+<button onclick="playSE('tsumo')">ツモ音</button>
+<button onclick="playSE('correct')">正解音</button>
+<button onclick="playSE('wrong')">不正解音</button>
+<button onclick="playSE('timeout')">時間切れ音</button>
+
+<script>
+var audioContext = null;
+var soundBuffers = {};
+var audioReady = false;
+
+var soundFiles = {
+  question: "sounds/question.mp3",
+  tsumo: "sounds/tsumo.mp3",
+  correct: "sounds/correct.mp3",
+  wrong: "sounds/wrong.mp3",
+  timeout: "sounds/timeout.mp3"
+};
+
+function initAudio(){
+  if(audioReady === true){
+    document.getElementById("status").innerHTML = "準備済み";
+    return;
+  }
+
+  var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  audioContext = new AudioContextClass();
+
+  document.getElementById("status").innerHTML = "読み込み中...";
+
+  var names = ["question", "tsumo", "correct", "wrong", "timeout"];
+  var loadedCount = 0;
+
+  for(var i = 0; i < names.length; i++){
+    loadSound(names[i], function(){
+      loadedCount++;
+
+      document.getElementById("status").innerHTML =
+        "読み込み中... " + loadedCount + " / " + names.length;
+
+      if(loadedCount === names.length){
+        audioReady = true;
+        document.getElementById("status").innerHTML = "準備完了";
+      }
+    });
+  }
+}
+
+function loadSound(name, callback){
+  fetch(soundFiles[name])
+    .then(function(response){
+      return response.arrayBuffer();
+    })
+    .then(function(arrayBuffer){
+      audioContext.decodeAudioData(arrayBuffer, function(buffer){
+        soundBuffers[name] = buffer;
+        callback();
+      });
+    })
+    .catch(function(error){
+      document.getElementById("status").innerHTML =
+        name + " の読み込みに失敗";
+    });
+}
+
+function playSE(name){
+  if(audioReady === false){
+    document.getElementById("status").innerHTML =
+      "先に音声を準備してください";
+    return;
+  }
+
+  var source = audioContext.createBufferSource();
+  var gain = audioContext.createGain();
+
+  source.buffer = soundBuffers[name];
+
+  if(name === "wrong"){
+    gain.gain.value = 1.2;
+  }else{
+    gain.gain.value = 0.8;
+  }
+
+  source.connect(gain);
+  gain.connect(audioContext.destination);
+
+  source.start(0);
+}
+</script>
+
+</body>
+</html>
