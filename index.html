@@ -570,6 +570,56 @@ function renderRoundInfo(q, suitMap){
   document.getElementById("roundInfo").innerHTML = html;
 }
 
+var soundUnlocked = false;
+
+function unlockSounds(){
+  if(soundUnlocked === true){
+    return;
+  }
+
+  soundUnlocked = true;
+
+  var soundIds = [
+    "soundQuestion",
+    "soundTsumo",
+    "soundCorrect",
+    "soundWrong",
+    "soundTimeout"
+  ];
+
+  for(var i = 0; i < soundIds.length; i++){
+    (function(soundId){
+      var sound = document.getElementById(soundId);
+
+      if(!sound){
+        return;
+      }
+
+      sound.load();
+
+      var originalVolume = sound.volume;
+      sound.volume = 0;
+      sound.currentTime = 0;
+
+      var playPromise = sound.play();
+
+      if(playPromise !== undefined){
+        playPromise.then(function(){
+          sound.pause();
+          sound.currentTime = 0;
+          sound.volume = originalVolume;
+        }).catch(function(error){
+          sound.volume = originalVolume;
+        });
+      }else{
+        sound.pause();
+        sound.currentTime = 0;
+        sound.volume = originalVolume;
+      }
+    })(soundIds[i]);
+  }
+}
+
 function playSound(soundId){
   var sound = document.getElementById(soundId);
 
@@ -577,7 +627,12 @@ function playSound(soundId){
     return;
   }
 
-  sound.volume = 0.7; // 音量 0.0〜1.0
+  if(soundId === "soundWrong"){
+  sound.volume = 1.0;
+}else{
+  sound.volume = 0.7;
+}
+
   sound.currentTime = 0;
 
   var playPromise = sound.play();
@@ -591,6 +646,8 @@ function playSound(soundId){
 
 function selectMode(seconds){
   selectedMode = seconds;
+  
+  unlockSounds();
 
   document.getElementById("mode3").className = "modeButton";
   document.getElementById("mode5").className = "modeButton";
