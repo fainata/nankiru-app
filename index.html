@@ -570,16 +570,42 @@ function renderRoundInfo(q, suitMap){
   document.getElementById("roundInfo").innerHTML = html;
 }
 
-var soundUnlocked = false;
 
-function unlockSounds(){
-  if(soundUnlocked === true){
+var audioContext = null;
+var soundBuffers = {};
+var audioReady = false;
+var audioLoading = false;
+
+var soundFiles = {
+  soundQuestion: "sounds/question.mp3",
+  soundTsumo: "sounds/tsumo.mp3",
+  soundCorrect: "sounds/correct.mp3",
+  soundWrong: "sounds/wrong.mp3",
+  soundTimeout: "sounds/timeout.mp3"
+};
+
+function initAudio(callback){
+  if(audioReady === true){
+    if(callback){
+      callback();
+    }
     return;
   }
 
-  soundUnlocked = true;
+  if(audioLoading === true){
+    return;
+  }
 
-  var soundIds = [
+  audioLoading = true;
+
+  var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  audioContext = new AudioContextClass();
+
+  if(audioContext.state === "suspended"){
+    audioContext.resume();
+  }
+
+  var names = [
     "soundQuestion",
     "soundTsumo",
     "soundCorrect",
@@ -587,66 +613,73 @@ function unlockSounds(){
     "soundTimeout"
   ];
 
-  for(var i = 0; i < soundIds.length; i++){
-    (function(soundId){
-      var sound = document.getElementById(soundId);
+  var loadedCount = 0;
 
-      if(!sound){
-        return;
+  for(var i = 0; i < names.length; i++){
+    loadSound(names[i], function(){
+      loadedCount++;
+
+      if(loadedCount === names.length){
+        audioReady = true;
+        audioLoading = false;
+
+        if(callback){
+          callback();
+        }
       }
-
-      sound.load();
-
-      var originalVolume = sound.volume;
-      sound.volume = 0;
-      sound.currentTime = 0;
-
-      var playPromise = sound.play();
-
-      if(playPromise !== undefined){
-        playPromise.then(function(){
-          sound.pause();
-          sound.currentTime = 0;
-          sound.volume = originalVolume;
-        }).catch(function(error){
-          sound.volume = originalVolume;
-        });
-      }else{
-        sound.pause();
-        sound.currentTime = 0;
-        sound.volume = originalVolume;
-      }
-    })(soundIds[i]);
+    });
   }
 }
 
-function playSound(soundId){
-  var sound = document.getElementById(soundId);
+function loadSound(name, callback){
+  fetch(soundFiles[name])
+    .then(function(response){
+      return response.arrayBuffer();
+    })
+    .then(function(arrayBuffer){
+      audioContext.decodeAudioData(arrayBuffer, function(buffer){
+        soundBuffers[name] = buffer;
+        callback();
+      });
+    })
+    .catch(function(error){
+      audioLoading = false;
+      console.log(name + " の読み込みに失敗");
+    });
+}
 
-  if(!sound){
+function playSound(soundId){
+  if(audioReady === false){
     return;
   }
 
+  if(!audioContext){
+    return;
+  }
+
+  if(audioContext.state === "suspended"){
+    audioContext.resume();
+  }
+
+  if(!soundBuffers[soundId]){
+    return;
+  }
+
+  var source = audioContext.createBufferSource();
+  var gain = audioContext.createGain();
+
+  source.buffer = soundBuffers[soundId];
+
   if(soundId === "soundWrong"){
-    sound.volume = 1.0;
+    gain.gain.value = 1.2;
   }else{
-    sound.volume = 0.75;
+    gain.gain.value = 0.8;
   }
 
-  try{
-    sound.pause();
-    sound.currentTime = 0;
-  }catch(error){
-    // 何もしない
-  }
+  source.connect(gain);
+  gain.connect(audioContext.destination);
 
-  var playPromise = sound.play();
-
-  if(playPromise !== undefined){
-    playPromise.catch(function(error){
-      // iPhone Safari側で止められた場合は何もしない
-    });
-  }
+  source.start(0);
 }
 
 function selectMode(seconds){
@@ -670,14 +703,24 @@ function selectMode(seconds){
 
 function startApp(){
   if(selectedMode === null){
-    document.getElementById("selectedModeText").innerHTML = "先にモードを選んでください。";
+    document.getElementById("selectedModeText").innerHTML =
+      "先にモードを選んでください。";
     return;
   }
 
-  document.getElementById("startScreen").style.display = "none";
-  document.getElementById("gameScreen").style.display = "block";
+  var startButton = document.getElementById("startButton");
+  startButton.innerHTML = "読み込み中...";
+  startButton.disabled = true;
 
-  chooseRandomQuestion();
+  initAudio(function(){
+    startButton.innerHTML = "スタート";
+    startButton.disabled = false;
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+
+    chooseRandomQuestion();
+  });
 }
 
 //chooseRandomQuestion();
