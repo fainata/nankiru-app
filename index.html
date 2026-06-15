@@ -584,6 +584,28 @@ var soundFiles = {
   soundTimeout: "sounds/timeout.mp3"
 };
 
+function unlockAudioContext(){
+  if(!audioContext){
+    return;
+  }
+
+  if(audioContext.state === "suspended"){
+    audioContext.resume();
+  }
+
+  var buffer = audioContext.createBuffer(1, 1, 22050);
+  var source = audioContext.createBufferSource();
+
+  source.buffer = buffer;
+  source.connect(audioContext.destination);
+
+  try{
+    source.start(0);
+  }catch(error){
+    // 何もしない
+  }
+}
+
 function initAudio(callback){
   if(audioReady === true){
     if(callback){
@@ -604,6 +626,8 @@ function initAudio(callback){
   if(audioContext.state === "suspended"){
     audioContext.resume();
   }
+  
+  unlockAudioContext();
 
   var names = [
     "soundQuestion",
