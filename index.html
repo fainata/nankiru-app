@@ -209,6 +209,13 @@ body.gameMode #result{
   line-height:1.5;
 }
 
+body.gameMode #timerArea{
+  display:none;
+}
+
+body.gameMode #result{
+  text-align:left;
+}
 </style>
 </head>
 
@@ -247,7 +254,7 @@ body.gameMode #result{
 </div>
 
 <div id="gameScreen" style="display:none;">
-  <p>残り時間：<span id="timer">-</span></p>
+  <p id="timerArea">残り時間：<span id="timer">-</span></p>
 
   <h3 id="questionTitle">問題1</h3>
 
@@ -1014,16 +1021,18 @@ function revealTsumoAndStartTimer(){
   canAnswer = true;
 
   if(selectedMode === 0){
-    document.getElementById("timer").innerHTML = "無制限";
-    return;
+  document.getElementById("result").innerHTML = "残り時間：無制限";
+  return;
   }
 
   timeLeft = selectedMode;
-  document.getElementById("timer").innerHTML = timeLeft + "秒";
+  document.getElementById("result").innerHTML =
+  '残り時間：<span style="color:#b03030; font-weight:bold;">' + timeLeft + '秒</span>';
 
   timerId = setInterval(function(){
-    timeLeft = timeLeft - 1;
-    document.getElementById("timer").innerHTML = timeLeft + "秒";
+  timeLeft = timeLeft - 1;
+  document.getElementById("result").innerHTML =
+  '残り時間：<span style="color:#b03030; font-weight:bold;">' + timeLeft + '秒</span>';
 
   if(timeLeft <= 0 && answered === false){
    answered = true;
