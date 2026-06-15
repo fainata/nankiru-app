@@ -196,6 +196,10 @@ audio{
   font-weight:bold;
 }
 
+body.gameMode h2{
+  display:none;
+}
+
 </style>
 </head>
 
@@ -750,6 +754,7 @@ function startApp(){
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
+	document.body.className = "gameMode";
 
     chooseRandomQuestion();
   });
@@ -1130,6 +1135,7 @@ function backToTitle(){
 
   document.getElementById("gameScreen").style.display = "none";
   document.getElementById("startScreen").style.display = "block";
+  document.body.className = "";
 
   document.getElementById("timer").innerHTML = "-";
   document.getElementById("questionTitle").innerHTML = "";
