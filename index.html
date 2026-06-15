@@ -216,6 +216,34 @@ body.gameMode #timerArea{
 body.gameMode #result{
   text-align:left;
 }
+
+.resultTop{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.resultJudge{
+  font-size:22px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.correctTiles{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  white-space:nowrap;
+}
+
+.ukeireLine{
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  white-space:nowrap;
+}
 </style>
 </head>
 
@@ -855,7 +883,7 @@ function convertUkeire(ukeire, suitMap){
     return "";
   }
 
-  var html = '<span style="margin-left:20px;">：';
+  var html = '<span class="ukeireLine">';
 
   for(var i = 0; i < ukeire.length; i++){
     var convertedTile = convertTileSuit(ukeire[i].tile, suitMap);
@@ -871,6 +899,26 @@ function convertUkeire(ukeire, suitMap){
   html += "</span>";
 
   return html;
+}
+
+function makeCorrectTilesHtml(){
+  var html = '<span class="correctTiles">正解：';
+
+  for(var i = 0; i < currentCorrect.length; i++){
+    html += getTileHtml(currentCorrect[i], 24);
+  }
+
+  html += '</span>';
+
+  return html;
+}
+
+function makeResultHeader(judgeText){
+  return '<div class="resultTop">' +
+         '<span class="resultJudge">' + judgeText + '</span>' +
+         makeCorrectTilesHtml() +
+         currentUkeireHtml +
+         '</div>';
 }
 
 function shuffleSuitBlocks(hand){
@@ -1042,9 +1090,7 @@ function revealTsumoAndStartTimer(){
    playSound("soundTimeout");
 
    document.getElementById("result").innerHTML =
-    "時間切れ！" + currentUkeireHtml + "<br><br>" +
-    "正解：<br>" +
-    currentComment;
+   makeResultHeader("時間切れ！") + "<br>" + currentComment;
 	
 	document.getElementById("nextButton").style.display = "inline-block";
 }
@@ -1101,21 +1147,21 @@ if(currentCorrect.indexOf(tile) !== -1){
   playSound("soundCorrect");
 
   document.getElementById("result").innerHTML =
-   "◎ 正解！" + currentUkeireHtml + "<br><br>" + currentComment;
+  makeResultHeader("◎ 正解！") + "<br>" + currentComment;
 
 }else if(currentOk && currentOk.indexOf(tile) !== -1){
 
   playSound("soundCorrect");
 
   document.getElementById("result").innerHTML =
-   "○ 及第点！" + currentUkeireHtml + "<br><br>" + currentComment;
+  makeResultHeader("○ 及第点！") + "<br>" + currentComment;
 
 }else{
 
   playSound("soundWrong");
 
   document.getElementById("result").innerHTML =
-    "× 不正解" + currentUkeireHtml + "<br><br>" + currentComment;
+  makeResultHeader("× 不正解") + "<br>" + currentComment;
 
 }
 
